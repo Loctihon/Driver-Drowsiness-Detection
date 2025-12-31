@@ -2,7 +2,7 @@ import cv2
 import os
 
 # --- CẤU HÌNH ---
-TARGET_COUNT = 100
+TARGET_COUNT = 145
 
 TASKS = [
     # Bạn cứ thêm video mới vào đây thoải mái, ảnh cũ vẫn còn nguyên
@@ -57,4 +57,5 @@ for video_path, output_folder in TASKS:
             print(f"    [Cảnh báo] Lỗi frame thứ {frame_idx}")
 
     cap.release()
+
     print(f"✅ HOÀN TẤT: Đã thêm {saved_count} ảnh từ video '{base_name}' vào dataset.\n")
