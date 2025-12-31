@@ -43,9 +43,6 @@ class NodDetector:
         self.daily_drive_seconds_cache = 0  # cache khi stop/start
         self.session_drive_seconds = 0      # thời gian phiên hiện tại
 
-
-
-
     def reset(self):
         """Hàm reset trạng thái về ban đầu"""
         self.min_y = None; self.max_y = None
@@ -144,13 +141,13 @@ class FatigueBar(QWidget):
 
         if self.value < 40:
             color = QColor("#2ecc71")
-            status = "TỈNH TÁO"
+            status = "AWAKE"
         elif self.value < 70:
             color = QColor("#f1c40f")
-            status = "BẮT ĐẦU MỆT"
+            status = "TIRED"
         else:
             color = QColor("#e74c3c")
-            status = "NGUY HIỂM"
+            status = "DANGEROUS"
 
         painter.setBrush(color)
         painter.drawRoundedRect(
@@ -162,7 +159,7 @@ class FatigueBar(QWidget):
         painter.drawText(
             self.rect(),
             Qt.AlignCenter,
-            f"MỨC ĐỘ MỆT: {int(self.value)}% | {status}"
+            f"FATIGUE LEVEL: {int(self.value)}% | {status}"
         )
 
 
@@ -255,7 +252,7 @@ class DrowsinessApp(QWidget):
         self.time_timer.start(1000)
 
         # Drive Time
-        self.drive_time_label = QLabel("Thời gian lái: 00:00:00", self)
+        self.drive_time_label = QLabel("Driving Time: 00:00:00", self)
         self.drive_time_label.setGeometry(1250, 550, 420, 40)
         self.drive_time_label.setFont(QFont("Arial", 14, QFont.Bold))
         self.drive_time_label.setStyleSheet("color:white; background:rgba(0,0,0,150); padding:5px;")
@@ -364,7 +361,7 @@ class DrowsinessApp(QWidget):
             features, bbox, nose = self.detector.extract_features(frame_ai)
         else: features = None
 
-        status_text = "BINH THUONG"
+        status_text = "NORMAL"
         box_color = (0, 255, 0)
         is_warning = False
         has_error = False
@@ -392,7 +389,7 @@ class DrowsinessApp(QWidget):
             if pred == 1:
                 if self.eye_start is None: self.eye_start = time.time()
                 elapsed = time.time() - self.eye_start
-                status_text = f"NGU GAT: {elapsed:.1f}s"
+                status_text = f"SLEEP: {elapsed:.1f}s"
                 box_color = (0, 165, 255)
                 has_error = True
                 
@@ -410,7 +407,7 @@ class DrowsinessApp(QWidget):
                 if self.yawn_start is None: self.yawn_start = time.time()
                 dur = time.time() - self.yawn_start
                 if dur > YAWN_TIME_THRESH:
-                    status_text = f"NGAP !!! ({dur:.1f}s)"
+                    status_text = f"YAWN !!! ({dur:.1f}s)"
                     box_color = (0, 255, 255)
                     has_error = True
                     # Tăng điểm Yawn
@@ -427,7 +424,7 @@ class DrowsinessApp(QWidget):
             if nods >= NOD_COUNT_THRESH:
                 is_warning = True
                 has_error = True
-                status_text = "NGU GAT !!!"
+                status_text = "SLEEP !!!"
                 # Phạt nặng điểm Sleep
                 self.score_sleep = min(self.score_sleep + 2.0, 100)
 
@@ -455,7 +452,7 @@ class DrowsinessApp(QWidget):
                 self.alarm_muted = False          # ✅ TỰ BỎ MUTE KHI NGỦ LẠI
 
                 cv2.rectangle(frame_ai, (0, 0), (w, h), (0, 0, 255), 10)
-                msg = "NGU GAT !!!"
+                msg = "SLEEP !!!"
                 cv2.putText(
                     frame_ai,
                     msg,
@@ -534,8 +531,8 @@ class DrowsinessApp(QWidget):
 
                 QMessageBox.warning(
                     self,
-                    "CẢNH BÁO MỆT MỎI",
-                    f"Mức độ mệt mỏi đã vượt {fatigue:.0f}%!\nHãy nghỉ ngơi ngay!"
+                    "FATIGUE WARNING",
+                    f"Fatigue level exceeded {fatigue:.0f}%!\nPlease take a rest immediately!"
                 )
         else:
             self._fatigue_warned = False
@@ -561,7 +558,7 @@ class DrowsinessApp(QWidget):
             return 0
 
         # Fatigue cơ bản (hành vi)
-        base_fatigue = (self.day_sleep + 0.5 * self.day_yawn) / self.day_total * 110
+        base_fatigue = (self.day_sleep + 0.5 * self.day_yawn) / self.day_total * 100
 
         # Fatigue theo thời gian lái: 4 tiếng = 70%
         time_factor = total_seconds / 14400 * 70
