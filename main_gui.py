@@ -336,7 +336,7 @@ class DrowsinessApp(QWidget):
         ss = self.session_drive_seconds % 60
 
         self.drive_time_label.setText(
-            f"Thời gian lái: {sh:02d}:{sm:02d}:{ss:02d}"
+            f"Driving Time: {sh:02d}:{sm:02d}:{ss:02d}"
         )
 
         # ===== CIRCLE DAILY =====
@@ -627,7 +627,7 @@ class DrowsinessApp(QWidget):
         self.daily_drive_seconds_cache = self.total_drive_seconds
         self.session_drive_seconds = 0
 
-        self.drive_time_label.setText("Thời gian lái: 00:00:00")
+        self.drive_time_label.setText("Driving Time: 00:00:00")
 
         self.eye_start = None
         self.yawn_start = None
